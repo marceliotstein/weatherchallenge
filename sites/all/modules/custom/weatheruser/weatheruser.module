@@ -16,8 +16,8 @@
 // implements hook_block_info
 
 function weatheruser_block_info() {
-  $blocks['lastvisited'] = array(
-    'info' => t('Last Visited'),
+  $blocks['loginstats'] = array(
+    'info' => t('Login Stats'),
     'cache' => DRUPAL_NO_CACHE,
   );
   return $blocks;
@@ -29,30 +29,30 @@ function weatheruser_block_view($delta = '') {
   $block = array();
 
   switch ($delta) {
-    case 'lastvisited':
-      $block['subject'] = t('Last Visited');
-      $block['content'] = last_visited();
+    case 'loginstats':
+      $out = "";
+      global $user;
+
+      // find values if available
+
+      if ($user->uid>0) {
+        $user_full = user_load($user->uid);
+        $message = "You logged in at ";
+        if (!empty($user_full->field_last_visited_message)) {
+          $message = $user_full->field_last_visited_message['und'][0]['value'];
+        }
+        $zone = drupal_get_user_timezone();
+        if (!empty($user->login)) {
+          $last = format_date($user->login,'small',$zone);
+        }
+        $out = $message . " " . $last . " (" . $zone . ")";
+      }
+
+      // produce block
+
+      $block['subject'] = t('Login Stats');
+      $block['content'] = $out;
       break;
   }
   return $block;
-}
-
-// provide user info
-
-function last_visited() {
-  global $user;
-  $out = "";
-  if ($user->uid>0) {
-    $user_full = user_load($user->uid);
-    $last_visited_message = "You last logged in at ";
-    if (!empty($user_full->field_last_visited_message)) {
-      $last_visited_message = $user_full->field_last_visited_message['und'][0]['value'];
-    }
-    if (!empty($user->login)) {
-      $zone = drupal_get_user_timezone();
-      $last = format_date($user->login,'small',$zone);
-      $out = $last_visited_message . "<br />" . $last . " " . $zone;
-    }
-  }
-  return $out;
 }
