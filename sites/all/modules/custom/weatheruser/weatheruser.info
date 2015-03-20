@@ -1,0 +1,5 @@
+name = Weather User
+description = Coding challenge for Weather.com
+package = Weather User
+version = 1.0
+core = 7.x

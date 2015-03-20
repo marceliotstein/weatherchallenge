@@ -1,0 +1,59 @@
+<?php
+ /*
+  * Coding challenge:
+  *
+  * 1. Display a block that shows the time the user last logged in. “You last logged in at “
+  * 2. In the user’s current time-zone
+  * 3. Have the block automatically be placed in left side-rail region (if available)
+  * 4. Make sure that the block is not visible for non-logged in users.
+  * 5. Allow the message to be configured per user.
+  * 6. Frontend Javascript should collapse (animated) the block after 10 seconds.
+  * 7. Make this a panels ctools content type (pane) in addition to a standard block
+  * 8. Describe any issues or concerns you see with this list of requirements for this task in the context of a high traffic site like weather.com.
+  *
+  */
+
+// implements hook_block_info
+
+function weatheruser_block_info() {
+  $blocks['lastvisited'] = array(
+    'info' => t('Last Visited'),
+    'cache' => DRUPAL_NO_CACHE,
+  );
+
+  return $blocks;
+}
+
+// implements hook_block_view
+
+function weatheruser_block_view($delta = '') {
+  $block = array();
+
+  switch ($delta) {
+    case 'lastvisited':
+      $block['subject'] = t('Last Visited');
+      $block['content'] = last_visited();
+      break;
+  }
+  return $block;
+}
+
+// provide user info
+
+function last_visited() {
+  global $user;
+  $out = "";
+  if ($user->uid>0) {
+    $user_full = user_load($user->uid);
+    $last_visited_message = "You last logged in at ";
+    if (!empty($user_full->field_last_visited_message)) {
+      $last_visited_message = $user_full->field_last_visited_message['und'][0]['value'];
+    }
+    if (!empty($user->login)) {
+      $zone = drupal_get_user_timezone();
+      $last = format_date($user->login,'small',$zone);
+      $out = $last_visited_message . "<br />" . $last . " " . $zone;
+    }
+  }
+  return $out;
+}
