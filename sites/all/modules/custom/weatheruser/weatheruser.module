@@ -1,6 +1,6 @@
 <?php
  /*
-  * Coding challenge:
+  * This module is a solution to the following coding challenge:
   *
   * 1. Display a block that shows the time the user last logged in. “You last logged in at “
   * 2. In the user’s current time-zone
@@ -20,7 +20,6 @@ function weatheruser_block_info() {
     'info' => t('Last Visited'),
     'cache' => DRUPAL_NO_CACHE,
   );
-
   return $blocks;
 }
 
